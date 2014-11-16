@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Mortgage Application</string>
+    <string name="title_activity_identity_proofing">Confirm Your Identity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_quiz">Answer questions to confirm your Identity</string>
+
+</resources>
