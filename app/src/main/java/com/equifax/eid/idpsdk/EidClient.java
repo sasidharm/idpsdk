@@ -1,5 +1,7 @@
 package com.equifax.eid.idpsdk;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
@@ -22,10 +24,14 @@ public class EidClient extends AsyncTask<EidRequest, Integer, IdentityProofing> 
     private View view;
     private View progressView;
 
-    public EidClient(View view, View progressView) {
+    private Activity activity;
+
+    public EidClient(Activity activity, View view, View progressView) {
+        this.activity = activity;
         this.view = view;
         this.progressView = progressView;
     }
+
     @Override
     protected IdentityProofing doInBackground(EidRequest... requests) {
         try {
@@ -37,15 +43,12 @@ public class EidClient extends AsyncTask<EidRequest, Integer, IdentityProofing> 
         EidRequest request = requests[0];
         Identity identity = request.getIdentity();
         IdentityProofing identityProofing = new IdentityProofing();
-        if(identity != null)
-        {
+        if (identity != null) {
             Questionnaire questionnaire = getQuestionnaire(identity);
             identityProofing.setQuestionnaire(questionnaire);
-        }
-        else {
+        } else {
             Answers answers = request.getAnswers();
-            if(answers != null)
-            {
+            if (answers != null) {
                 Assessment assessment = getAssessment(answers);
                 identityProofing.setAssessment(assessment);
             }
@@ -77,8 +80,7 @@ public class EidClient extends AsyncTask<EidRequest, Integer, IdentityProofing> 
         question.setQuestionId(questionId);
         question.setQuestionText(questionText);
         long answerId = 1L;
-        for(String choice : choices)
-        {
+        for (String choice : choices) {
             question.getAnswerChoices().add(createAnswerChoice(answerId++, choice));
         }
         return question;
@@ -96,5 +98,24 @@ public class EidClient extends AsyncTask<EidRequest, Integer, IdentityProofing> 
         super.onPostExecute(identityProofing);
         this.progressView.setVisibility(View.GONE);
         this.view.setVisibility(View.VISIBLE);
+        Questionnaire questionnaire = identityProofing.getQuestionnaire();
+        Assessment assessment = identityProofing.getAssessment();
+        if (questionnaire != null) {
+            Log.d("Quiz", "Displaying Quiz");
+            showQuiz(questionnaire);
+        } else {
+            Log.d("Assessment", assessment.name());
+            Log.d("Quiz", "Not Displaying Quiz");
+            activity.setResult(activity.RESULT_OK, activity.getIntent());
+            activity.finish();
+        }
+    }
+
+    private void showQuiz(Questionnaire questionnaire) {
+
+        Log.d("Quiz", "Starting Quiz activity");
+        Intent quizIntent = new Intent(activity, QuizActivity.class);
+        quizIntent.putExtra("quiz", questionnaire);
+        activity.startActivityForResult(quizIntent, 145);
     }
 }

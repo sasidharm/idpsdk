@@ -1,9 +1,11 @@
 package com.equifax.eid.idpsdk.identity;
 
+import java.io.Serializable;
+
 /**
  * Created by Sasidhar on 11/15/14.
  */
-public class Identity {
+public class Identity implements Serializable {
     private String firstName;
     private String lastName;
     private String ssn;

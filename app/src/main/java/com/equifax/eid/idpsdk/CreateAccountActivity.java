@@ -17,6 +17,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.equifax.eid.idpsdk.identity.Identity;
+
 
 /**
  * A login screen that offers login via email/password.
@@ -65,7 +67,6 @@ public class CreateAccountActivity extends Activity {
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
     }
-
 
 
     /**
@@ -198,7 +199,14 @@ public class CreateAccountActivity extends Activity {
             showProgress(false);
 
             if (success) {
-                startActivity(new Intent(CreateAccountActivity.this, IdentityProofingActivity.class));
+                Intent intent = new Intent(CreateAccountActivity.this, IdentityProofingActivity.class);
+                Identity identity = new Identity();
+                identity.setFirstName("Gertrude");
+                identity.setLastName("Harkenreadeo");
+                identity.setDob("09/21/1968");
+                identity.setSsn("610323244");
+                intent.putExtra("identity", identity);
+                startActivity(intent);
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();

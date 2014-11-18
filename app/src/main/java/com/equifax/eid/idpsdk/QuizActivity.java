@@ -1,5 +1,7 @@
 package com.equifax.eid.idpsdk;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
@@ -16,11 +18,16 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.equifax.eid.idpsdk.identity.AnswerChoice;
+import com.equifax.eid.idpsdk.identity.Answers;
+import com.equifax.eid.idpsdk.identity.EidRequest;
 import com.equifax.eid.idpsdk.identity.Question;
 import com.equifax.eid.idpsdk.identity.Questionnaire;
 
 
 public class QuizActivity extends Activity {
+
+    private View quizView;
+    private View quizProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,12 +66,38 @@ public class QuizActivity extends Activity {
             @Override
             public void onClick(View view) {
                 Log.d("Quiz", "Finishing Activity");
-                setResult(RESULT_OK, getIntent());
-                finish();
+                quizView = findViewById(R.id.quiz_view);
+                quizProgress = findViewById(R.id.quiz_progress);
+                EidClient eidClient = new EidClient(QuizActivity.this, quizView, quizProgress);
+                EidRequest eidRequest = new EidRequest();
+                Answers answers = new Answers();
+                eidRequest.setAnswers(answers);
+                eidClient.execute(eidRequest);
+                showProgress(true);
             }
         });
     }
 
+    private void showProgress(final boolean show) {
+        int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+        quizView.setVisibility(show ? View.GONE : View.VISIBLE);
+        quizView.animate().setDuration(shortAnimTime).alpha(
+                show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                quizView.setVisibility(show ? View.GONE : View.VISIBLE);
+            }
+        });
+
+        quizProgress.setVisibility(show ? View.VISIBLE : View.GONE);
+        quizProgress.animate().setDuration(shortAnimTime).alpha(
+                show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                quizProgress.setVisibility(show ? View.VISIBLE : View.GONE);
+            }
+        });
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

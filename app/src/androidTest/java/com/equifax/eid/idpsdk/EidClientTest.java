@@ -13,8 +13,7 @@ public class EidClientTest extends TestCase {
 
     private EidClient eidClient = new EidClient();
 
-    public void testDoInBackground()
-    {
+    public void testDoInBackground() {
         EidRequest request = new EidRequest();
         Identity identity = new Identity();
         request.setIdentity(identity);
