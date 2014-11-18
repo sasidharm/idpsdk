@@ -3,8 +3,10 @@ package com.equifax.eid.idpsdk;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -53,6 +55,14 @@ public class QuizActivity extends Activity {
         button.setText(R.string.action_submit);
         button.setTextAppearance(this, R.style.label_style);
         quizForm.addView(button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("Quiz", "Finishing Activity");
+                setResult(RESULT_OK, getIntent());
+                finish();
+            }
+        });
     }
 
 

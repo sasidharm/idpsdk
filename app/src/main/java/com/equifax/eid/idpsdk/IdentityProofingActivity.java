@@ -4,26 +4,16 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.transition.Visibility;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.TextView;
 
-import com.equifax.eid.idpsdk.identity.AnswerChoice;
-import com.equifax.eid.idpsdk.identity.Assessment;
 import com.equifax.eid.idpsdk.identity.EidRequest;
 import com.equifax.eid.idpsdk.identity.Identity;
 import com.equifax.eid.idpsdk.identity.IdentityProofing;
-import com.equifax.eid.idpsdk.identity.Question;
 import com.equifax.eid.idpsdk.identity.Questionnaire;
 
 import java.util.concurrent.ExecutionException;
@@ -33,9 +23,12 @@ public class IdentityProofingActivity extends Activity {
 
     private Questionnaire questionnaire = null;
 
-    private Assessment assessment = null;
+//    private Assessment assessment = null;
 
     private EidClient eidClient;
+
+    private View idFormView;
+    private View idProgressView;
 
     public IdentityProofingActivity() {
     }
@@ -44,6 +37,8 @@ public class IdentityProofingActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_identity_proofing);
+        idFormView = findViewById(R.id.identity_submit_form);
+        idProgressView = findViewById(R.id.idp_progress);
 
         final EidRequest request = new EidRequest();
         Identity identity = new Identity();
@@ -59,12 +54,14 @@ public class IdentityProofingActivity extends Activity {
                 {
                     return;
                 }
-                eidClient = new EidClient();
+                showProgress(true);
+                eidClient = new EidClient(idFormView, idProgressView);
                 AsyncTask<EidRequest, Integer, IdentityProofing> task = eidClient.execute(request);
                 try {
                     IdentityProofing proofing = task.get();
+//                    showProgress(false);
                     questionnaire = proofing.getQuestionnaire();
-                    assessment = proofing.getAssessment();
+//                    assessment = proofing.getAssessment();
                     if (questionnaire != null) {
                         Log.d("Quiz", "Displaying Quiz");
                         showQuiz();
@@ -84,14 +81,46 @@ public class IdentityProofingActivity extends Activity {
         });
     }
 
+    private void showProgress(final boolean show) {
+        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+        // for very easy animations. If available, use these APIs to fade-in
+        // the progress spinner.
+
+        if (show) {
+            Log.d("ProgressView", "Displaying progress view");
+        } else {
+            Log.d("ProgressView", "Hiding progress view");
+        }
+        idFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+        idProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+
+        /*int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+        idFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+        idFormView.animate().setDuration(shortAnimTime).alpha(
+                show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                idFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+            }
+        });
+
+        idProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+        idProgressView.animate().setDuration(shortAnimTime).alpha(
+                show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                idProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            }
+        });*/
+    }
+
     private void showQuiz() {
 
         if (questionnaire != null) {
             Log.d("Quiz", "Starting Quiz activity");
             Intent quizIntent = new Intent(this, QuizActivity.class);
             quizIntent.putExtra("quiz", questionnaire);
-            startActivity(quizIntent);
-
+            startActivityForResult(quizIntent, 145);
         }
     }
     private String getText(View view) {
@@ -120,4 +149,12 @@ public class IdentityProofingActivity extends Activity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d("onActivityResult", "RequestCode: " + requestCode + "; ResultCode: " + resultCode);
+        super.onActivityResult(requestCode, resultCode, data);
+        finish();
+    }
+
 }

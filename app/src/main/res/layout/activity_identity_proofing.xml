@@ -1,7 +1,9 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
@@ -29,10 +31,10 @@
 
             <ImageView
                 android:id="@+id/wells_image"
-                android:src="@drawable/equifax"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:layout_gravity="left" />
+                android:layout_gravity="left"
+                android:src="@drawable/equifax" />
 
             <EditText
                 android:id="@+id/first_name"
@@ -72,8 +74,8 @@
                 android:layout_margin="@dimen/activity_horizontal_margin"
                 android:hint="@string/prompt_dob"
                 android:maxLines="1"
-                android:textAppearance="@style/label_style"
-                android:singleLine="true" />
+                android:singleLine="true"
+                android:textAppearance="@style/label_style" />
 
             <DatePicker
                 android:id="@+id/dob_value"
@@ -92,5 +94,5 @@
                 android:textStyle="bold" />
 
         </LinearLayout>
-</ScrollView>
-</RelativeLayout>
+    </ScrollView>
+</LinearLayout>

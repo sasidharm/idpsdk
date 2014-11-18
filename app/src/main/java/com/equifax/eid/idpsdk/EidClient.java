@@ -2,6 +2,7 @@ package com.equifax.eid.idpsdk;
 
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.View;
 
 import com.equifax.eid.idpsdk.identity.AnswerChoice;
 import com.equifax.eid.idpsdk.identity.Answers;
@@ -12,17 +13,27 @@ import com.equifax.eid.idpsdk.identity.IdentityProofing;
 import com.equifax.eid.idpsdk.identity.Question;
 import com.equifax.eid.idpsdk.identity.Questionnaire;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 /**
+ * Handles communication to eID server. Returns mocked responses for now.
  * Created by Sasidhar on 11/15/14.
  */
 public class EidClient extends AsyncTask<EidRequest, Integer, IdentityProofing> {
 
+    private View view;
+    private View progressView;
+
+    public EidClient(View view, View progressView) {
+        this.view = view;
+        this.progressView = progressView;
+    }
     @Override
     protected IdentityProofing doInBackground(EidRequest... requests) {
+        try {
+            // Simulate network access.
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            //Nothing to do
+        }
         EidRequest request = requests[0];
         Identity identity = request.getIdentity();
         IdentityProofing identityProofing = new IdentityProofing();
@@ -43,10 +54,16 @@ public class EidClient extends AsyncTask<EidRequest, Integer, IdentityProofing> 
     }
 
     private Assessment getAssessment(Answers answers) {
+        if (answers != null) {
+            Log.d("Answers", String.valueOf(answers.getQuestionnaireId()));
+        }
         return Assessment.PASS;
     }
 
     private Questionnaire getQuestionnaire(Identity identity) {
+        if (identity != null) {
+            Log.d("Identity", identity.getFirstName());
+        }
         Questionnaire questionnaire = new Questionnaire();
         questionnaire.setQuestionnaireId(1L);
         questionnaire.getQuestions().add(createQuestion(1L, "Your credit file indicates that you may have opened an Auto Loan in 2013. Who is the provider of this Auto loan account?", "PNC Bank", "Wells Fargo", "Bank of America", "JP Morgan Chase", "None of the Above"));
@@ -59,7 +76,6 @@ public class EidClient extends AsyncTask<EidRequest, Integer, IdentityProofing> 
         Question question = new Question();
         question.setQuestionId(questionId);
         question.setQuestionText(questionText);
-        List<AnswerChoice> answerChoices = new ArrayList<AnswerChoice>();
         long answerId = 1L;
         for(String choice : choices)
         {
@@ -75,4 +91,10 @@ public class EidClient extends AsyncTask<EidRequest, Integer, IdentityProofing> 
         return choice;
     }
 
+    @Override
+    protected void onPostExecute(IdentityProofing identityProofing) {
+        super.onPostExecute(identityProofing);
+        this.progressView.setVisibility(View.GONE);
+        this.view.setVisibility(View.VISIBLE);
+    }
 }
